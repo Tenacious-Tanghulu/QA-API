@@ -1,0 +1,22 @@
+{
+  "name": "qa-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nosql-schema.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postgres": "psql -d qa -U sdc",
+    "load-data": "psql -h localhost -d qa -U sdc -f rdbms-schema.sql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tenacious-Tanghulu/QA-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tenacious-Tanghulu/QA-API/issues"
+  },
+  "homepage": "https://github.com/Tenacious-Tanghulu/QA-API#readme"
+}
