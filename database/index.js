@@ -20,5 +20,13 @@ module.exports = {
 
   // insertQuestionByProduct: () => (),
 
-  // insertAnswerByQuestion: () => ()
+  // insertAnswerByQuestion: () => (),
+
+  // updateQuestionHelpful: () => (),
+
+  // updateQuestionReport: () => (),
+
+  // updateAnswerHelpful: () => (),
+
+  // updateAnswerReport: () => ()
 }

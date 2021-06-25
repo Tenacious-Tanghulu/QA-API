@@ -20,5 +20,9 @@ router.get('/questions/:questionId/answers', (req, res) => {
 // router.post('/questions/:questionId/answers', (req, res) => ());
 
 // put
+// router.put('/questions/:question_id/helpful', (req, res) => ());
+// router.put('/questions/:question_id/report', (req, res) => ());
+// router.put('/answers/:answer_id/helpful', (req, res) => ());
+// router.put('/answers/:answer_id/report', (req, res) => ());
 
 module.exports = router;
