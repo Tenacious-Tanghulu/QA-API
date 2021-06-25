@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS questions, answers, photos;
 CREATE TABLE questions (
   id SERIAL PRIMARY KEY,
   product_id INTEGER NOT NULL,
-  body TEXT,
+  body VARCHAR(1000),
   date_written DOUBLE PRECISION,
   asker_name VARCHAR(60),
   asker_email VARCHAR(100),
@@ -14,7 +14,7 @@ CREATE TABLE questions (
 CREATE TABLE answers (
   id SERIAL PRIMARY KEY,
   question_id INTEGER NOT NULL REFERENCES questions(id),
-  body TEXT,
+  body VARCHAR(1000),
   date_written DOUBLE PRECISION,
   answerer_name VARCHAR(60),
   answerer_email VARCHAR(100),
