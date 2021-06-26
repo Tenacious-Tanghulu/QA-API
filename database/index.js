@@ -4,19 +4,11 @@ const config = require('./config.js');
 const pool = new Pool(config);
 
 module.exports = {
-  selectQuestionsByProduct: (productId) => (
-    pool
-      .query(`select id, body, date_written, asker_name, helpful, reported from questions where product_id = ${productId}`)
-      .then(res => console.log(res.rows[0]))
-      .catch(err => console.error('Error executing query', err.stack))
-  ),
+  selectQuestionsByProduct: productId => pool.query(`SELECT id AS question_id, body AS question_body, date_written AS question_date, asker_name, helpful AS question_helpfulness, reported FROM questions WHERE product_id = ${productId}`),
 
-  selectAnswersByQuestion: (questionId) => (
-  pool
-      .query(`select id, body, date_written, answerer_name, helpful, reported from answers where question_id = ${questionId}`)
-      .then(res => console.log(res.rows[0]))
-      .catch(err => console.error('Error executing query', err.stack))
-  )
+  selectAnswersByQuestion: questionId => pool.query(`SELECT id AS answer_id, body, date_written AS date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = ${questionId}`),
+
+  selectPhotosByAnswer: answerId => pool.query(`SELECT id, photo_url AS url FROM photos WHERE answer_id = ${answerId}`)
 
   // insertQuestionByProduct: () => (),
 

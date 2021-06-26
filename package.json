@@ -5,8 +5,7 @@
   "main": "nosql-schema.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postgres": "psql -d qa -U sdc",
-    "load-data": "psql -h localhost -d qa -U sdc -f rdbms-schema.sql"
+    "postgres": "psql -d qa -U sdc"
   },
   "repository": {
     "type": "git",
