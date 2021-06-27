@@ -15,7 +15,22 @@ router.get('/questions/:productId', (req, res) => {
       return Promise.all(promises);
     })
     .then(result => {
-      questions.forEach((question, index) => question.answers = result[index].rows);
+      const answersArray = result.map(answers => answers.rows);
+      const promisesArray = answersArray.map((answers, index) => {
+        questions[index].answers = answers;
+        const promises = answers.map(answer => database.selectPhotosByAnswer(answer.answer_id));
+        return Promise.all(promises);
+      });
+      return Promise.all(promisesArray);
+    })
+    .then(result => {
+      result.forEach((photos, questionIndex) => {
+        const currQuestion = questions[questionIndex];
+        photos.forEach((photo, answerIndex) => {
+          const currAnswer = currQuestion.answers[answerIndex];
+          currAnswer.photos = photo.rows;
+        });
+      });
       res.status(200).send(questions);
     })
     .catch(err => console.error('Error executing query', err.stack))
