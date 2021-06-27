@@ -36,7 +36,11 @@ router.get('/questions/:productId', (req, res) => {
           currAnswer.photos = photo.rows;
         });
       });
-      res.status(200).send(questions);
+      const data = {
+        product_id: productId.toString(),
+        results: questions
+      }
+      res.status(200).send(data);
     })
     .catch(err => console.error('Error executing query', err.stack))
 });
