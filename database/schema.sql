@@ -45,3 +45,7 @@ CSV HEADER;
 
 ALTER TABLE questions ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written/1000);
 ALTER TABLE answers ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written/1000);
+
+CREATE INDEX question_id_index ON questions(id);
+CREATE INDEX answer_id_index ON answers(id);
+-- CREATE INDEX photo_id_index ON photos(id);

@@ -10,15 +10,18 @@ router.get('/questions/:productId', (req, res) => {
     .then(result => {
       const promises = result.rows.map(question => {
         questions.push(question);
-        return database.selectAnswersByQuestion(question.question_id);
+        return database.selectAnswersByQuestion_1(question.question_id);
       });
       return Promise.all(promises);
     })
     .then(result => {
       const answersArray = result.map(answers => answers.rows);
       const promisesArray = answersArray.map((answers, index) => {
-        questions[index].answers = answers;
-        const promises = answers.map(answer => database.selectPhotosByAnswer(answer.answer_id));
+        questions[index].answers = {};
+        const promises = answers.map(answer => {
+          questions[index].answers[answer.id] = answer;
+          return database.selectPhotosByAnswer(answer.id);
+        });
         return Promise.all(promises);
       });
       return Promise.all(promisesArray);
@@ -26,8 +29,10 @@ router.get('/questions/:productId', (req, res) => {
     .then(result => {
       result.forEach((photos, questionIndex) => {
         const currQuestion = questions[questionIndex];
+        const answerIds = Object.keys(currQuestion.answers);
         photos.forEach((photo, answerIndex) => {
-          const currAnswer = currQuestion.answers[answerIndex];
+          const answerId = answerIds[answerIndex];
+          const currAnswer = currQuestion.answers[answerId];
           currAnswer.photos = photo.rows;
         });
       });
@@ -39,7 +44,7 @@ router.get('/questions/:productId', (req, res) => {
 router.get('/questions/:questionId/answers', (req, res) => {
   const questionId = req.params.questionId;
   const answers = [];
-  database.selectAnswersByQuestion(questionId)
+  database.selectAnswersByQuestion_2(questionId)
     .then(result => {
       const promises = result.rows.map(answer => {
         answers.push(answer);
