@@ -47,6 +47,8 @@ router.get('/questions/:productId', (req, res) => {
 
 router.get('/questions/:questionId/answers', (req, res) => {
   const questionId = req.params.questionId;
+  // const page = req.params.page;
+  // const count = req.params.count;
   const answers = [];
   database.selectAnswersByQuestion_2(questionId)
     .then(result => {
@@ -58,7 +60,13 @@ router.get('/questions/:questionId/answers', (req, res) => {
     })
     .then(result => {
       answers.forEach((answer, index) => answer.photos = result[index].rows);
-      res.status(200).send(answers);
+      const data = {
+        question: questionId.toString(),
+        // page: page,
+        // count: count,
+        results: answers
+      }
+      res.status(200).send(data);
     })
     .catch(err => console.error('Error executing query', err.stack))
 });
