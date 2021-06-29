@@ -3,46 +3,69 @@ const database = require('../database');
 const router = express.Router();
 
 // get requests
+// router.get('/questions/:productId', (req, res) => {
+//   const { productId } = req.params;
+//   const questions = [];
+//   database.selectQuestionsByProduct(productId)
+//     .then(result => {
+//       const promises = result.rows.map(question => {
+//         questions.push(question);
+//         return database.selectAnswersByQuestion_1(question.question_id);
+//       });
+//       return Promise.all(promises);
+//     })
+//     .then(result => {
+//       const answersArray = result.map(answers => answers.rows);
+//       const promisesArray = answersArray.map((answers, index) => {
+//         questions[index].answers = {};
+//         const promises = answers.map(answer => {
+//           questions[index].answers[answer.id] = answer;
+//           return database.selectPhotosByAnswer(answer.id);
+//         });
+//         return Promise.all(promises);
+//       });
+//       return Promise.all(promisesArray);
+//     })
+//     .then(result => {
+//       result.forEach((photos, questionIndex) => {
+//         const currQuestion = questions[questionIndex];
+//         const answerIds = Object.keys(currQuestion.answers);
+//         photos.forEach((photo, answerIndex) => {
+//           const answerId = answerIds[answerIndex];
+//           const currAnswer = currQuestion.answers[answerId];
+//           currAnswer.photos = photo.rows;
+//         });
+//       });
+//       const data = {
+//         product_id: productId.toString(),
+//         results: questions
+//       }
+//       res.status(200).send(data);
+//     })
+//     .catch(err => console.error('Query execution', err.stack))
+// });
+
 router.get('/questions/:productId', (req, res) => {
-  const productId = req.params.productId;
-  const questions = [];
+  const { productId } = req.params;
+  const { page, count } = req.query;
   database.selectQuestionsByProduct(productId)
     .then(result => {
-      const promises = result.rows.map(question => {
-        questions.push(question);
-        return database.selectAnswersByQuestion_1(question.question_id);
+      result.rows.forEach(question => {
+        const { answers } = question;
+        const answersObj = {};
+        answers.forEach(answer => answersObj[answer.id] = answer);
+        question.answers = answersObj;
       });
-      return Promise.all(promises);
+      const body = {
+        product_id: productId,
+        results: result.rows
+      };
+      res.status(200).send(body);
     })
-    .then(result => {
-      const answersArray = result.map(answers => answers.rows);
-      const promisesArray = answersArray.map((answers, index) => {
-        questions[index].answers = {};
-        const promises = answers.map(answer => {
-          questions[index].answers[answer.id] = answer;
-          return database.selectPhotosByAnswer(answer.id);
-        });
-        return Promise.all(promises);
-      });
-      return Promise.all(promisesArray);
+    .catch(err => {
+      console.error('Query execution', err.stack);
+      res.end();
     })
-    .then(result => {
-      result.forEach((photos, questionIndex) => {
-        const currQuestion = questions[questionIndex];
-        const answerIds = Object.keys(currQuestion.answers);
-        photos.forEach((photo, answerIndex) => {
-          const answerId = answerIds[answerIndex];
-          const currAnswer = currQuestion.answers[answerId];
-          currAnswer.photos = photo.rows;
-        });
-      });
-      const data = {
-        product_id: productId.toString(),
-        results: questions
-      }
-      res.status(200).send(data);
-    })
-    .catch(err => console.error('Query execution', err.stack))
 });
 
 // router.get('/questions/:questionId/answers', (req, res) => {
@@ -72,15 +95,22 @@ router.get('/questions/:productId', (req, res) => {
 // });
 
 router.get('/questions/:questionId/answers', (req, res) => {
-  const questionId = req.params.questionId;
-  // const page = req.params.page;
-  // const count = req.params.count;
-  const answers = [];
-  database.selectAnswersByQuestion(questionId)
+  const { questionId } = req.params;
+  const { page, count } = req.query;
+  database.selectAnswersByQuestion(questionId, page, count)
     .then(result => {
-      res.status(200).send(result.rows);
+      const body = {
+        question: questionId,
+        page: page,
+        count: count,
+        results: result.rows
+      };
+      res.status(200).send(body);
     })
-    .catch(err => console.error('Query execution', err.stack))
+    .catch(err => {
+      console.error('Query execution', err.stack);
+      res.end();
+    })
 });
 
 // post requests
@@ -92,18 +122,14 @@ router.post('/questions', (req, res) => {
     .catch(err => console.error('Query execution', err.stack))
 });
 
-// router.post('/questions/:questionId/answers', (req, res) => ());
-// router.post('/questions/:questionId/answers', (req, res) => {
-//   const questionId = req.params.questionId;
-//   const { body, name, email } = req.body;
-//   const photoUrl = req.body.photo_url;
-//   database.insertAnswerByQuestion(questionId, body, name, email)
-//     .then(result => {
-
-//     })
-//     .catch(err => console.error('Query execution', err.stack))
-//   res.end();
-// });
+router.post('/questions/:questionId/answers', (req, res) => {
+  const questionId = req.params.questionId;
+  const { body, name, email } = req.body;
+  const photoUrl = req.body.photo_url;
+  database.insertAnswerByQuestion(questionId, body, name, email, photoUrl)
+    .then(result => res.status(201).end())
+    .catch(err => console.error('Query execution', err.stack))
+});
 
 // put requests
 // router.put('/questions/:question_id/helpful', (req, res) => ());
