@@ -42,38 +42,68 @@ router.get('/questions/:productId', (req, res) => {
       }
       res.status(200).send(data);
     })
-    .catch(err => console.error('Error executing query', err.stack))
+    .catch(err => console.error('Query execution', err.stack))
 });
+
+// router.get('/questions/:questionId/answers', (req, res) => {
+//   const questionId = req.params.questionId;
+//   // const page = req.params.page;
+//   // const count = req.params.count;
+//   const answers = [];
+//   database.selectAnswersByQuestion_2(questionId)
+//     .then(result => {
+//       const promises = result.rows.map(answer => {
+//         answers.push(answer);
+//         return database.selectPhotosByAnswer(answer.answer_id);
+//       });
+//       return Promise.all(promises);
+//     })
+//     .then(result => {
+//       answers.forEach((answer, index) => answer.photos = result[index].rows);
+//       const data = {
+//         question: questionId.toString(),
+//         // page: page,
+//         // count: count,
+//         results: answers
+//       }
+//       res.status(200).send(data);
+//     })
+//     .catch(err => console.error('Query execution', err.stack))
+// });
 
 router.get('/questions/:questionId/answers', (req, res) => {
   const questionId = req.params.questionId;
   // const page = req.params.page;
   // const count = req.params.count;
   const answers = [];
-  database.selectAnswersByQuestion_2(questionId)
+  database.selectAnswersByQuestion(questionId)
     .then(result => {
-      const promises = result.rows.map(answer => {
-        answers.push(answer);
-        return database.selectPhotosByAnswer(answer.answer_id);
-      });
-      return Promise.all(promises);
+      res.status(200).send(result.rows);
     })
-    .then(result => {
-      answers.forEach((answer, index) => answer.photos = result[index].rows);
-      const data = {
-        question: questionId.toString(),
-        // page: page,
-        // count: count,
-        results: answers
-      }
-      res.status(200).send(data);
-    })
-    .catch(err => console.error('Error executing query', err.stack))
+    .catch(err => console.error('Query execution', err.stack))
 });
 
 // post requests
-// router.post('/questions', (req, res) => ());
+router.post('/questions', (req, res) => {
+  const productId = req.body.product_id;
+  const { body, name, email } = req.body;
+  database.insertQuestionByProduct(productId, body, name, email)
+    .then(result => res.status(201).end())
+    .catch(err => console.error('Query execution', err.stack))
+});
+
 // router.post('/questions/:questionId/answers', (req, res) => ());
+// router.post('/questions/:questionId/answers', (req, res) => {
+//   const questionId = req.params.questionId;
+//   const { body, name, email } = req.body;
+//   const photoUrl = req.body.photo_url;
+//   database.insertAnswerByQuestion(questionId, body, name, email)
+//     .then(result => {
+
+//     })
+//     .catch(err => console.error('Query execution', err.stack))
+//   res.end();
+// });
 
 // put requests
 // router.put('/questions/:question_id/helpful', (req, res) => ());
