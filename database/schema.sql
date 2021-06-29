@@ -8,7 +8,7 @@ CREATE TABLE questions (
   date_written DOUBLE PRECISION,
   asker_name VARCHAR(60),
   asker_email VARCHAR(100),
-  reported INTEGER DEFAULT 0,
+  reported BOOLEAN DEFAULT false,
   helpful INTEGER DEFAULT 0
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE answers (
   date_written DOUBLE PRECISION,
   answerer_name VARCHAR(60),
   answerer_email VARCHAR(100),
-  reported INTEGER DEFAULT 0,
+  reported BOOLEAN DEFAULT false,
   helpful INTEGER DEFAULT 0
 );
 
@@ -46,8 +46,8 @@ DELIMITER ','
 CSV HEADER;
 
 -- convert date datatype
-ALTER TABLE questions ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written/1000);
-ALTER TABLE answers ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written/1000);
+ALTER TABLE questions ALTER date_written TYPE timestamp USING to_timestamp(date_written/1000);
+ALTER TABLE answers ALTER date_written TYPE timestamp USING to_timestamp(date_written/1000);
 
 -- indexing
 CREATE INDEX product_id_index ON questions(product_id);

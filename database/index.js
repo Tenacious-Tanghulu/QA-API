@@ -16,19 +16,19 @@ module.exports = {
           answers.helpful AS helpfulness,
           COALESCE(json_agg(json_build_object('id', photos.id, 'url', photos.photo_url)) FILTER (WHERE photos.id IS NOT NULL), '[]') AS photos
         FROM answers LEFT JOIN photos ON answers.id = photos.answer_id
-        WHERE answers.question_id = questions.id
+        WHERE answers.question_id = questions.id AND answers.reported = false
         GROUP BY answers.id
       ) AS nested_answer
       ) AS answers
     FROM questions LEFT JOIN answers ON questions.id = answers.question_id
-    WHERE questions.product_id = ($1)
+    WHERE questions.product_id = ($1) AND questions.reported = false
     GROUP BY questions.id`, [productId]),
 
   selectAnswersByQuestion: (questionId, page, count) => pool.query(
     `SELECT answers.id AS answer_id, answers.body, answers.date_written, answers.answerer_name, answers.helpful AS helpfulness,
       COALESCE(json_agg(json_build_object('id', photos.id, 'url', photos.photo_url)) FILTER (WHERE photos.id IS NOT NULL), '[]') AS photos
     FROM answers LEFT JOIN photos ON answers.id = photos.answer_id
-    WHERE answers.question_id = ($1)
+    WHERE answers.question_id = ($1) AND answers.reported = false
     GROUP BY answers.id`, [questionId]),
 
   insertQuestionByProduct: (productId, body, name, email) => pool.query(
@@ -51,7 +51,7 @@ module.exports = {
 
   updateQuestionReported: questionId => pool.query(
     `UPDATE questions
-    SET reported = reported + 1
+    SET reported = true
     WHERE id = ($1)`, [questionId]),
 
   updateAnswerHelpful: answerId => pool.query(
@@ -61,7 +61,7 @@ module.exports = {
 
   updateAnswerReported: answerId => pool.query(
     `UPDATE answers
-    SET reported = reported + 1
+    SET reported = true
     WHERE id = ($1)`, [answerId])
 }
 
