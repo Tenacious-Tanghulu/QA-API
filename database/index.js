@@ -4,14 +4,6 @@ const config = require('./config.js');
 const pool = new Pool(config);
 
 module.exports = {
-  // selectQuestionsByProduct: productId => pool.query('SELECT id AS question_id, body AS question_body, date_written AS question_date, asker_name, helpful AS question_helpfulness, reported FROM questions WHERE product_id = ($1)', [productId]),
-
-  // selectAnswersByQuestion_1: questionId => pool.query('SELECT id, body, date_written AS date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = ($1)', [questionId]),
-
-  // selectAnswersByQuestion_2: questionId => pool.query('SELECT id AS answer_id, body, date_written AS date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = ($1)', [questionId]),
-
-  // selectPhotosByAnswer: answerId => pool.query('SELECT id, photo_url AS url FROM photos WHERE answer_id = ($1)', [answerId]),
-
   selectQuestionsByProduct: (productId, page, count) => pool.query(
     `SELECT questions.id AS question_id, questions.body AS question_body, questions.date_written AS question_date, questions.asker_name, questions.helpful AS question_helpfulness, questions.reported,
       (SELECT COALESCE(json_agg(nested_answer) FILTER (WHERE nested_answer IS NOT NULL), '[]')
@@ -50,13 +42,33 @@ module.exports = {
       RETURNING id
     )
     INSERT INTO photos (answer_id, photo_url)
-    VALUES ((SELECT * FROM new_answer), ($5))`, [questionId, body, name, email, photoUrl])
+    VALUES ((SELECT * FROM new_answer), ($5))`, [questionId, body, name, email, photoUrl]),
 
-  // updateQuestionHelpful: () => (),
+  updateQuestionHelpful: questionId => pool.query(
+    `UPDATE questions
+    SET helpful = helpful + 1
+    WHERE id = ($1)`, [questionId]),
 
-  // updateQuestionReport: () => (),
+  updateQuestionReported: questionId => pool.query(
+    `UPDATE questions
+    SET reported = reported + 1
+    WHERE id = ($1)`, [questionId]),
 
-  // updateAnswerHelpful: () => (),
+  updateAnswerHelpful: answerId => pool.query(
+    `UPDATE answers
+    SET helpful = helpful + 1
+    WHERE id = ($1)`, [answerId]),
 
-  // updateAnswerReport: () => ()
+  updateAnswerReported: answerId => pool.query(
+    `UPDATE answers
+    SET reported = reported + 1
+    WHERE id = ($1)`, [answerId])
 }
+
+// selectQuestionsByProduct: productId => pool.query('SELECT id AS question_id, body AS question_body, date_written AS question_date, asker_name, helpful AS question_helpfulness, reported FROM questions WHERE product_id = ($1)', [productId]),
+
+// selectAnswersByQuestion_1: questionId => pool.query('SELECT id, body, date_written AS date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = ($1)', [questionId]),
+
+// selectAnswersByQuestion_2: questionId => pool.query('SELECT id AS answer_id, body, date_written AS date, answerer_name, helpful AS helpfulness FROM answers WHERE question_id = ($1)', [questionId]),
+
+// selectPhotosByAnswer: answerId => pool.query('SELECT id, photo_url AS url FROM photos WHERE answer_id = ($1)', [answerId]),
